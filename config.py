@@ -1,28 +1,62 @@
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
-from libqtile import bar, layout, widget, hook
+# Keys
+from libqtile.config import Key 
 from libqtile.lazy import lazy
+
+# Mouse
+from libqtile.config import Click, Drag
+
+# Groups
+from libqtile.config import Group, Match
+
+# Layouts
+from libqtile import layout
+
+# Screens
+from libqtile.config import Screen
+from libqtile import bar, widget
+
+# Screens/Extras
 from qtile_extras import widget
 from qtile_extras.widget.decorations import PowerLineDecoration
+
+# Startup 
 import os
 import subprocess
+from libqtile import hook
 
-
-# Definitions
+# Variables ----------------------------------------------
 mod = "mod4"
 terminal = "kitty"
 explorer = "thunar"
 launcher = "rofi -show drun"
 
+theme = {
+    "background": "#282738",
+    "foreground": "#353446",
+}
+
+font_family = "DejaVu Sans Bold"
+font_size = 15
+
+images_dir = os.path.expanduser("~/images/")
+
 widget_defaults = dict(
-    font="sans",
-    fontsize=15,
-    padding=10,
-    foreground='#a1b5ec'
+    font = font_family,
+    fontsize = font_size,
+    padding = 10,
 )
+
 extension_defaults = widget_defaults.copy()
 
 
-# Default and Custom Keys
+# Startup/Scripts -----------------------------------------
+# Set the wallpaper using feh
+@hook.subscribe.startup_once
+def autostart():
+    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "comfy-1.jpg")])
+
+
+# Key Bindings ------------------------------------------
 keys = [
     # Switch between windows
     Key([mod], "left", lazy.layout.left(), desc="Move focus to left"),
@@ -32,14 +66,12 @@ keys = [
     Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
    
     # Move windows between left/right columns or move up/down in current stack.
-    # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
     Key([mod, "shift"], "right", lazy.layout.shuffle_right(), desc="Move window to the right"),
     Key([mod, "shift"], "down", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([mod, "shift"], "up", lazy.layout.shuffle_up(), desc="Move window up"),
 
     # Grow windows. If current window is on the edge of screen and direction
-    # will be to screen edge - window would shrink.
     Key([mod, "control"], "left", lazy.layout.grow_left(), desc="Grow window to the left"),
     Key([mod, "control"], "right", lazy.layout.grow_right(), desc="Grow window to the right"),
     Key([mod, "control"], "down", lazy.layout.grow_down(), desc="Grow window down"),
@@ -48,8 +80,7 @@ keys = [
     
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
-    # Unsplit = 1 window displayed, like Max layout, but still with
-    # multiple stack panes
+    # Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
     Key(
         [mod, "shift"],
         "Return",
@@ -58,20 +89,28 @@ keys = [
     ),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
 
-    # Toggle between different layouts as defined below
+    # Toggle between different layouts
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "r", lazy.spawn(launcher), desc="Spawn launcher"),
     
-    # -- custom --
     # Spawn default file explorer
     Key([mod], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
 ]
 
-# Groups 
-groups = [Group(i) for i in ["a", "b", "c", "d", "e"]]
+
+# Mouse Bindings ----------------------------------------
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front()),
+]
+
+
+# Groups -----------------------------------------------
+groups = [Group(i) for i in ["\uf111 ", "\uf111", "\uea71 ",]]
 group_hotkeys = "12345"
 
 for g, k in zip(groups, group_hotkeys):
@@ -96,15 +135,18 @@ for g, k in zip(groups, group_hotkeys):
     )
 
 
-# Layouts
+# Layouts ---------------------------------------------
 layouts = [
     layout.Columns(margin=(0, 5, 5, 5), border_focus='#a1b5ec', border_width=1),
     layout.Max(),
 ]
 
 
-# Topside bar
-powerline = {
+# Screens --------------------------------------------
+screens = []
+num_screens = 2  # Change this value to the number of screens you want
+
+powerline_forward_slash = {
     "decorations": [
         PowerLineDecoration(
             path="forward_slash"
@@ -112,37 +154,63 @@ powerline = {
     ]
 }
 
-screens = []
-num_screens = 2  # Change this value to the number of screens you want
 
 for _ in range(num_screens):
     screen = Screen(
         top=bar.Bar(
             [
-                widget.Image(filename="~/images/arch-linux-icon.jpg", background="282738", scale=True),
-                widget.GroupBox(highlight_method='block', background="282738", **powerline),
-                widget.Spacer(background="353446", **powerline),
-                widget.Clock(format="%H:%M", background="282738", padding=15),
+                widget.Image(
+                    background = theme["background"], 
+                    filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
+                    scale = True, 
+                    margin_y = 5
+                ),
+                
+                widget.GroupBox(
+                    background = theme["background"], 
+                    highlight_method = 'block', 
+                    **powerline_forward_slash
+                ),
+
+                widget.Spacer(
+                    background = theme["foreground"], 
+                    **powerline_forward_slash
+                ),
+                
+                widget.Clock(
+                    background = theme["background"], 
+                    format="%H:%M", 
+                    padding=15
+                ),
             ],
-            24,
+            30,
             margin=(5, 5, 5, 5),
         ),
     )
     screens.append(screen)
 
 
-# Drag floating layouts.
-mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
-    Click([mod], "Button2", lazy.window.bring_to_front()),
-]
+# General Configuration Variables ---------------------
 
+# A function which generates group binding hotkeys. It takes a single argument, the DGroups object, and can use that to set up dynamic key bindings.
+# A sample implementation is available in 'libqtile/dgroups.py' called `simple_key_binder()`, which will bind groups to "mod+shift+0-10" by default.
 dgroups_key_binder = None
+
+# A list of Rule objects which can send windows to various groups based on matching criteria.
 dgroups_app_rules = []  # type: list
+
+# Controls whether or not focus follows the mouse around as it moves across windows in a layout.
 follow_mouse_focus = True
+
+# When clicked, should the window be brought to the front or not. 
+# If this is set to "floating_only", only floating windows will get affected (This sets the X Stack Mode to Above.)
 bring_front_click = False
+
+# If true, the cursor follows the focus as directed by the keyboard, warping to the center of the focused window. 
+# When switching focus between screens, If there are no windows in the screen, the cursor will warp to the center of the screen.
 cursor_warp = False
+
+# The default floating layout to use. This allows you to set custom floating rules among other things if you wish.
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
@@ -155,16 +223,25 @@ floating_layout = layout.Floating(
         Match(title="pinentry"),  # GPG key password entry
     ]
 )
-auto_fullscreen = True
+
+# If a window requests to be fullscreen, it is automatically fullscreened. 
+# Set this to false if you only want windows to be fullscreen if you ask them to be.
+auto_fullscreen = False
+
+# Behavior of the _NET_ACTIVATE_WINDOW message sent by applications
+#
+# urgent: urgent flag is set for the window
+# focus: automatically focus the window
+# smart: automatically focus if the window is in the current group
+# never: never automatically focus any window that requests it
 focus_on_window_activation = "smart"
+
+# Controls whether or not to automatically reconfigure screens when there are changes in randr output configuration.
 reconfigure_screens = True
 
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
-
-# When using the Wayland backend, this can be used to configure input devices.
-wl_input_rules = None
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
@@ -174,13 +251,7 @@ wl_input_rules = None
 #
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
-wmname = "LG3D"
+#wmname = "LG3D"
 
-
-# -- custom --
-# Set the wallpaper using feh
-wallpaper_path = os.path.expanduser("~/images/comfy-1.jpg")
-subprocess.Popen(["feh", "--bg-fill", wallpaper_path])
-
-picom_path = os.path.expanduser("~/.config/picom/picom.conf")
-subprocess.Popen(["picom", "--config", picom_path])
+# When using the Wayland backend, this can be used to configure input devices.
+wl_input_rules = None
