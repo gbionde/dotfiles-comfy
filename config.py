@@ -25,20 +25,23 @@ import subprocess
 from libqtile import hook
 
 # Variables ----------------------------------------------
-mod = "mod4"
+modifier = "mod4"
 terminal = "kitty"
 explorer = "thunar"
 launcher = "rofi -show drun"
 
 theme = {
+    "transparent": "00000000",
     "background": "#282738",
     "foreground": "#353446",
 }
 
-font_family = "DejaVu Sans Bold"
+font_family = "DejaVu Sans"
+font_family_bold = "DejaVu Sans Bold"
 font_size = 15
 
 images_dir = os.path.expanduser("~/images/")
+home_dir = os.path.expanduser("~/")
 
 widget_defaults = dict(
     font = font_family,
@@ -54,85 +57,59 @@ extension_defaults = widget_defaults.copy()
 @hook.subscribe.startup_once
 def autostart():
     subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "comfy-1.jpg")])
-
+    subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
 
 # Key Bindings ------------------------------------------
 keys = [
     # Switch between windows
-    Key([mod], "left", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "right", lazy.layout.right(), desc="Move focus to right"),
-    Key([mod], "down", lazy.layout.down(), desc="Move focus down"),
-    Key([mod], "up", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([modifier], "left", lazy.layout.left(), desc="Move focus to left"),
+    Key([modifier], "right", lazy.layout.right(), desc="Move focus to right"),
+    Key([modifier], "down", lazy.layout.down(), desc="Move focus down"),
+    Key([modifier], "up", lazy.layout.up(), desc="Move focus up"),
+    Key([modifier], "space", lazy.layout.next(), desc="Move window focus to other window"),
    
     # Move windows between left/right columns or move up/down in current stack.
-    Key([mod, "shift"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
-    Key([mod, "shift"], "right", lazy.layout.shuffle_right(), desc="Move window to the right"),
-    Key([mod, "shift"], "down", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "shift"], "up", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([modifier, "shift"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([modifier, "shift"], "right", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([modifier, "shift"], "down", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([modifier, "shift"], "up", lazy.layout.shuffle_up(), desc="Move window up"),
 
     # Grow windows. If current window is on the edge of screen and direction
-    Key([mod, "control"], "left", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([mod, "control"], "right", lazy.layout.grow_right(), desc="Grow window to the right"),
-    Key([mod, "control"], "down", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "control"], "up", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key([modifier, "control"], "left", lazy.layout.grow_left(), desc="Grow window to the left"),
+    Key([modifier, "control"], "right", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key([modifier, "control"], "down", lazy.layout.grow_down(), desc="Grow window down"),
+    Key([modifier, "control"], "up", lazy.layout.grow_up(), desc="Grow window up"),
+    Key([modifier], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
     
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
     Key(
-        [mod, "shift"],
+        [modifier, "shift"],
         "Return",
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
-    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([modifier], "Return", lazy.spawn(terminal), desc="Launch terminal"),
 
     # Toggle between different layouts
-    Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
-    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([mod], "r", lazy.spawn(launcher), desc="Spawn launcher"),
+    Key([modifier], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([modifier], "q", lazy.window.kill(), desc="Kill focused window"),
+    Key([modifier, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+    Key([modifier, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([modifier], "r", lazy.spawn(launcher), desc="Spawn launcher"),
     
     # Spawn default file explorer
-    Key([mod], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
+    Key([modifier], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
 ]
 
 
-# Mouse Bindings ----------------------------------------
+# Mouse Bindings --------------------------------------
 mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
-    Click([mod], "Button2", lazy.window.bring_to_front()),
+    Drag([modifier], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([modifier], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([modifier], "Button2", lazy.window.bring_to_front()),
 ]
-
-
-# Groups -----------------------------------------------
-groups = [Group(i) for i in ["\uf111 ", "\uf111", "\uea71 ",]]
-group_hotkeys = "12345"
-
-for g, k in zip(groups, group_hotkeys):
-    keys.extend(
-        [
-            # mod1 + letter of group = switch to group
-            Key(
-                [mod],
-                k,
-                lazy.group[g.name].toscreen(),
-                desc=f"Switch to group {g.name}",
-            ),
-
-            # mod1 + shift + letter of group = switch to & move focused window to group
-            Key(
-                [mod, "shift"],
-                k,
-                lazy.window.togroup(g.name, switch_group=False),
-                desc=f"Switch to & move focused window to group {g.name}"
-            )
-        ]
-    )
 
 
 # Layouts ---------------------------------------------
@@ -140,6 +117,32 @@ layouts = [
     layout.Columns(margin=(0, 5, 5, 5), border_focus='#a1b5ec', border_width=1),
     layout.Max(),
 ]
+
+
+# Groups -----------------------------------------------
+group_icon = "\uf111 "  
+group_hotkeys = "123"  
+
+for hotkey in group_hotkeys:
+    keys.extend([
+        # mod1 + letter of group = switch to group
+        Key(
+            [modifier],
+            hotkey,
+            lazy.group[hotkey].toscreen(),
+            desc=f"Switch to group {hotkey}",
+        ),
+
+        # mod1 + shift + letter of group = switch to & move focused window to group
+        Key(
+            [modifier, "shift"],
+            hotkey,
+            lazy.window.togroup(hotkey, switch_group=False),
+            desc=f"Switch to & move focused window to group {hotkey}",
+        )
+    ])
+
+groups = [Group(hotkey, label=group_icon) for hotkey in group_hotkeys]
 
 
 # Screens --------------------------------------------
@@ -153,7 +156,6 @@ powerline_forward_slash = {
         )
     ]
 }
-
 
 for _ in range(num_screens):
     screen = Screen(
@@ -174,12 +176,24 @@ for _ in range(num_screens):
 
                 widget.Spacer(
                     background = theme["foreground"], 
-                    **powerline_forward_slash
+                    **powerline_forward_slash,
                 ),
-                
+
+                widget.Battery(
+                    background = theme["background"], 
+                    format = '{char}  {percent:2.0%}',  
+                    fontsize = font_size, 
+                    charge_char = "\U000f0084",  # Material Design icon for charging battery
+                    discharge_char = "\U000f0083",  # Material Design icon for discharging battery
+                    full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
+                    unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
+                    low_foreground = "FF0000",  
+                    low_percentage = 0.15, 
+                ),
+
                 widget.Clock(
                     background = theme["background"], 
-                    format="%H:%M", 
+                    format="\uf43a  %H:%M", 
                     padding=15
                 ),
             ],
