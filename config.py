@@ -1,6 +1,6 @@
 # Keys
-from libqtile.config import Key 
 from libqtile.lazy import lazy
+from libqtile.config import Key 
 
 # Mouse
 from libqtile.config import Click, Drag
@@ -12,8 +12,8 @@ from libqtile.config import Group, Match
 from libqtile import layout
 
 # Screens
-from libqtile.config import Screen
 from libqtile import bar, widget
+from libqtile.config import Screen
 
 # Screens/Extras
 from qtile_extras import widget
@@ -54,8 +54,7 @@ theme = {
 
 widget_defaults = dict(
     font = font_family,
-    fontsize = font_size,
-    foreground = theme["text"],
+    fontsize = 15,
     padding = 10,
 )
 
@@ -66,7 +65,7 @@ extension_defaults = widget_defaults.copy()
 # Set the wallpaper using feh
 @hook.subscribe.startup_once
 def autostart():
-    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "comfy-1.jpg")])
+    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
     subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
 
 # Key Bindings ------------------------------------------
@@ -179,34 +178,34 @@ for _ in range(num_screens):
                 ),
                 
                 widget.GroupBox(
-                    background = theme["base"], 
-                    highlight_method = 'block', 
-                    **powerline_forward_slash
+                   background = theme["base"], 
+                   highlight_method = 'block', 
+                   **powerline_forward_slash
                 ),
                 
-                # widget.Spacer(
-                #     background = theme["surface0"], 
-                #     **powerline_forward_slash,
-                # ),
-
-                widget.Battery(
-                    background = theme["base"], 
-                    format = '{char}  {percent:2.0%}',  
-                    fontsize = font_size, 
-                    font = font_family_bold,
-                    charge_char = "\U000f0084",  # Material Design icon for charging battery
-                    discharge_char = "\U000f0083",  # Material Design icon for discharging battery
-                    full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
-                    unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
-                    low_foreground = "FF0000",  
-                    low_percentage = 0.15, 
+                widget.Spacer(
+                    background = theme["surface0"], 
+                    **powerline_forward_slash,
                 ),
 
+               widget.Battery(
+                   format = '{char}  {percent:2.0%}',  
+                   fontsize = 15,
+                   background = theme["base"], 
+                   font = font_family_bold,
+                   charge_char = "\U000f0084",  # Material Design icon for charging battery
+                   discharge_char = "\U000f0083",  # Material Design icon for discharging battery
+                   full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
+                   unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
+                   low_foreground = "FF0000",  
+                   low_percentage = 0.15, 
+               ),
+
                 widget.Clock(
-                    background = theme["base"], 
-                    format="\uf43a  %H:%M", 
-                    font=font_family_bold,
-                    padding=15,
+                   background = theme["base"], 
+                   format="\uf43a  %H:%M", 
+                   font=font_family_bold,
+                   padding=15,
                 ),
             ],
             40,
