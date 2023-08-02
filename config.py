@@ -30,22 +30,32 @@ terminal = "kitty"
 explorer = "thunar"
 launcher = "rofi -show drun"
 
-theme = {
-    "transparent": "00000000",
-    "background": "#282738",
-    "foreground": "#353446",
-}
+# Directories
+home_dir = os.path.expanduser("~/")
+images_dir = os.path.expanduser("~/images/")
 
+# Font Style
+font_size = 15,
 font_family = "DejaVu Sans"
 font_family_bold = "DejaVu Sans Bold"
-font_size = 15
 
-images_dir = os.path.expanduser("~/images/")
-home_dir = os.path.expanduser("~/")
+# Catppuccin Frappé
+theme = {
+    "base": "#1e1e2e",
+    "surface0": "#313244",
+    "surface1": "#45475a",
+    "text": "#cdd6f4",
+    "subtext0":"#a6adc8",
+    "subtext1":"#bac2de",
+    "green":"#a6e3a1",
+    "yellow":"#f9e2af",
+    "peach":"#fab387",
+}
 
 widget_defaults = dict(
     font = font_family,
     fontsize = font_size,
+    foreground = theme["text"],
     padding = 10,
 )
 
@@ -162,27 +172,28 @@ for _ in range(num_screens):
         top=bar.Bar(
             [
                 widget.Image(
-                    background = theme["background"], 
+                    background = theme["base"], 
                     filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
                     scale = True, 
                     margin_y = 5
                 ),
                 
                 widget.GroupBox(
-                    background = theme["background"], 
+                    background = theme["base"], 
                     highlight_method = 'block', 
                     **powerline_forward_slash
                 ),
-
-                widget.Spacer(
-                    background = theme["foreground"], 
-                    **powerline_forward_slash,
-                ),
+                
+                # widget.Spacer(
+                #     background = theme["surface0"], 
+                #     **powerline_forward_slash,
+                # ),
 
                 widget.Battery(
-                    background = theme["background"], 
+                    background = theme["base"], 
                     format = '{char}  {percent:2.0%}',  
                     fontsize = font_size, 
+                    font = font_family_bold,
                     charge_char = "\U000f0084",  # Material Design icon for charging battery
                     discharge_char = "\U000f0083",  # Material Design icon for discharging battery
                     full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
@@ -192,12 +203,13 @@ for _ in range(num_screens):
                 ),
 
                 widget.Clock(
-                    background = theme["background"], 
+                    background = theme["base"], 
                     format="\uf43a  %H:%M", 
-                    padding=15
+                    font=font_family_bold,
+                    padding=15,
                 ),
             ],
-            30,
+            40,
             margin=(5, 5, 5, 5),
         ),
     )
