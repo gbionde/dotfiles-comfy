@@ -10,3 +10,7 @@ Based on <a href="https://github.com/Comfy-Themes/Spicetify"> this theme (comfy/
 **Shell:** zsh + oh-my-zsh <br/>
 **Extras:** feh, scrot. <br/>
 
+## Screenshots
+
+<img src="assets/screenshots/clean.png" />
+<img src="assets/screenshots/rofi.png" />
