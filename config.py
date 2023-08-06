@@ -39,17 +39,25 @@ font_size = 15,
 font_family = "DejaVu Sans"
 font_family_bold = "DejaVu Sans Bold"
 
-# Catppuccin Frappé
-theme = {
-    "base": "#1e1e2e",
-    "surface0": "#313244",
-    "surface1": "#45475a",
-    "text": "#cdd6f4",
-    "subtext0":"#a6adc8",
-    "subtext1":"#bac2de",
-    "green":"#a6e3a1",
-    "yellow":"#f9e2af",
-    "peach":"#fab387",
+# Pywal dynamic theme
+colors = []
+cache = os.path.join(home_dir, '.cache/wal/colors')
+
+def load_colors(cache):
+    with open(cache, 'r') as file:
+        for i in range(8):
+            colors.append(file.readline().strip())
+    colors.append('#ffffff')
+    lazy.reload()
+load_colors(cache)
+
+pywal_theme = {
+    "base": colors[0],
+    "surface0": colors[1],
+    "surface1": colors[2],
+    "text": colors[3],
+    "subtext0": colors[4],
+    "subtext1": colors[5],
 }
 
 widget_defaults = dict(
@@ -60,13 +68,15 @@ widget_defaults = dict(
 
 extension_defaults = widget_defaults.copy()
 
-
 # Startup/Scripts -----------------------------------------
-# Set the wallpaper using feh
 @hook.subscribe.startup_once
 def autostart():
-    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
+    # subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
     subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
+
+@hook.subscribe.startup
+def restart():
+    subprocess.Popen(["wal", "-i", images_dir])
 
 # Key Bindings ------------------------------------------
 keys = [
@@ -110,8 +120,14 @@ keys = [
     
     # Spawn default file explorer
     Key([modifier], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
-]
 
+    # Raise and lower volume
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("pulsemixer --change-volume +5")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("pulsemixer --change-volume -5")),
+
+    # Printscreen
+    Key([], "Print", lazy.spawn("scrot")),
+]
 
 # Mouse Bindings --------------------------------------
 mouse = [
@@ -120,13 +136,11 @@ mouse = [
     Click([modifier], "Button2", lazy.window.bring_to_front()),
 ]
 
-
 # Layouts ---------------------------------------------
 layouts = [
     layout.Columns(margin=(0, 5, 5, 5), border_focus='#a1b5ec', border_width=1),
     layout.Max(),
 ]
-
 
 # Groups -----------------------------------------------
 group_icon = "\uf111 "  
@@ -153,7 +167,6 @@ for hotkey in group_hotkeys:
 
 groups = [Group(hotkey, label=group_icon) for hotkey in group_hotkeys]
 
-
 # Screens --------------------------------------------
 screens = []
 num_screens = 2  # Change this value to the number of screens you want
@@ -171,49 +184,52 @@ for _ in range(num_screens):
         top=bar.Bar(
             [
                 widget.Image(
-                    background = theme["base"], 
+                    background = pywal_theme["base"], 
                     filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
                     scale = True, 
-                    margin_y = 5
+                    margin_y = 5,
+                    **powerline_forward_slash,
                 ),
                 
                 widget.GroupBox(
-                   background = theme["base"], 
-                   highlight_method = 'block', 
-                   **powerline_forward_slash
+                    background = pywal_theme["base"], 
+                    highlight_method = 'block',
+                    inactive="#FFFFFF",
+                    foreground="#FFFFFF",
+                    **powerline_forward_slash
                 ),
                 
                 widget.Spacer(
-                    background = theme["surface0"], 
+                    background = "#00000000", 
                     **powerline_forward_slash,
                 ),
 
-               widget.Battery(
-                   format = '{char}  {percent:2.0%}',  
-                   fontsize = 15,
-                   background = theme["base"], 
-                   font = font_family_bold,
-                   charge_char = "\U000f0084",  # Material Design icon for charging battery
-                   discharge_char = "\U000f0083",  # Material Design icon for discharging battery
-                   full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
-                   unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
-                   low_foreground = "FF0000",  
-                   low_percentage = 0.15, 
-               ),
+                widget.Battery(
+                    format = '{char}  {percent:2.0%}',  
+                    background = pywal_theme["base"], 
+                    font = font_family_bold,
+                    charge_char = "\U000f0084",  # Material Design icon for charging battery
+                    discharge_char = "\U000f0083",  # Material Design icon for discharging battery
+                    full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
+                    unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
+                    low_foreground = "FF0000",  
+                    low_percentage = 0.15, 
+                    **powerline_forward_slash,
+                ),
 
                 widget.Clock(
-                   background = theme["base"], 
+                   background = pywal_theme["base"], 
                    format="\uf43a  %H:%M", 
                    font=font_family_bold,
                    padding=15,
                 ),
             ],
             40,
-            margin=(5, 5, 5, 5),
+            background = "#00000000",
+            margin=(5, 10, 5, 10),
         ),
     )
     screens.append(screen)
-
 
 # General Configuration Variables ---------------------
 
