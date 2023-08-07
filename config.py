@@ -78,6 +78,16 @@ def autostart():
 def restart():
     subprocess.Popen(["wal", "-i", images_dir])
 
+
+def toggle_keyboard_layout(qtile):
+    current_layout = subprocess.run(['setxkbmap', '-query'], capture_output=True, text=True).stdout
+    if 'br' in current_layout:
+        # Switch to US English layout
+        subprocess.run(['setxkbmap', 'us'])
+    else:
+        # Switch to Brazilian Portuguese ABNT2 layout
+        subprocess.run(['setxkbmap', 'br', 'abnt2'])
+
 # Key Bindings ------------------------------------------
 keys = [
     # Switch between windows
@@ -121,12 +131,21 @@ keys = [
     # Spawn default file explorer
     Key([modifier], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
 
-    # Raise and lower volume
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("pulsemixer --change-volume +5")),
-    Key([], "XF86AudioLowerVolume", lazy.spawn("pulsemixer --change-volume -5")),
+    # Raise, lower and mute volume
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer set Master 5%+"), desc="Increase volume using amixer"),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer set Master 5%-"), desc="Decrease volume using amixer"),
+    Key([], "XF86AudioMute", lazy.spawn("amixer set Master toggle"), desc="Mute volume using amixer"),
+
+    # Key to increase and decrease screen brightness using brightnessctl
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set +5%"), desc="Increase brightness using brightnessctl"),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 5%-"), desc="Decrease brightness using brightnessctl"),
+
+    # Key to toggle between Brazilian Portuguese ABNT2 and US English
+    Key(["mod1"], "Tab", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
 
     # Printscreen
     Key([], "Print", lazy.spawn("scrot")),
+    Key([modifier, "shift"], "s", lazy.spawn("scrot -s")),
 ]
 
 # Mouse Bindings --------------------------------------
@@ -187,7 +206,7 @@ for _ in range(num_screens):
                     background = pywal_theme["base"], 
                     filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
                     scale = True, 
-                    margin_y = 5,
+                    margin_y = 9,
                     **powerline_forward_slash,
                 ),
                 
@@ -204,9 +223,26 @@ for _ in range(num_screens):
                     **powerline_forward_slash,
                 ),
 
+                widget.Backlight(
+                    backlight_name="nvidia_0",  
+                    format = '\U000f00e0  {percent:2.0%}',  
+                    background = pywal_theme["text"],
+                    font = font_family_bold,
+                    **powerline_forward_slash,
+                ),
+
+                widget.Volume(
+                    # emoji=True,
+                    # emoji_list=['\u000f075f', '\u000f0580', '\u000f057e', '\u000f057e'],
+                    fmt = '\uf028  {}',
+                    background = pywal_theme["surface1"],
+                    font = font_family_bold,
+                    **powerline_forward_slash,
+                ),
+
                 widget.Battery(
                     format = '{char}  {percent:2.0%}',  
-                    background = pywal_theme["base"], 
+                    background = pywal_theme["surface0"],
                     font = font_family_bold,
                     charge_char = "\U000f0084",  # Material Design icon for charging battery
                     discharge_char = "\U000f0083",  # Material Design icon for discharging battery
@@ -226,7 +262,7 @@ for _ in range(num_screens):
             ],
             40,
             background = "#00000000",
-            margin=(5, 10, 5, 10),
+            margin=(5, 10, 15, 10),
         ),
     )
     screens.append(screen)
