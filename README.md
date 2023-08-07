@@ -8,7 +8,7 @@ Based on <a href="https://github.com/Comfy-Themes/Spicetify"> this theme (comfy/
 **Compositor:** jonaburg-picom fork <br/>
 **Terminal:** kitty <br/>
 **Shell:** zsh + oh-my-zsh <br/>
-**Dependencies:** feh, scrot, amixer, brightnessctl, setxkbmap, thunar. <br/>
+**Dependencies:** feh, scrot, amixer, brightnessctl, setxkbmap, thunar, ttf-nerd-fonts-symbols. <br/>
 
 ## Screenshots
 
