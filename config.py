@@ -55,9 +55,9 @@ pywal_theme = {
     "base": colors[0],
     "surface0": colors[1],
     "surface1": colors[2],
-    "text": colors[3],
-    "subtext0": colors[4],
-    "subtext1": colors[5],
+    "surface2": colors[3],
+    "surface3": colors[4],
+    "surface4": colors[5],
 }
 
 widget_defaults = dict(
@@ -77,7 +77,6 @@ def autostart():
 @hook.subscribe.startup
 def restart():
     subprocess.Popen(["wal", "-i", images_dir])
-
 
 def toggle_keyboard_layout(qtile):
     current_layout = subprocess.run(['setxkbmap', '-query'], capture_output=True, text=True).stdout
@@ -223,36 +222,38 @@ for _ in range(num_screens):
                     **powerline_forward_slash,
                 ),
 
+                # Current brightness
                 widget.Backlight(
                     backlight_name="nvidia_0",  
                     format = '\U000f00e0  {percent:2.0%}',  
-                    background = pywal_theme["text"],
+                    background = pywal_theme["surface3"],
                     font = font_family_bold,
                     **powerline_forward_slash,
                 ),
 
+                # Current volume, uses amixer
                 widget.Volume(
-                    # emoji=True,
-                    # emoji_list=['\u000f075f', '\u000f0580', '\u000f057e', '\u000f057e'],
                     fmt = '\uf028  {}',
-                    background = pywal_theme["surface1"],
+                    background = pywal_theme["surface2"],
                     font = font_family_bold,
                     **powerline_forward_slash,
                 ),
 
+                # Current battery
                 widget.Battery(
                     format = '{char}  {percent:2.0%}',  
                     background = pywal_theme["surface0"],
                     font = font_family_bold,
-                    charge_char = "\U000f0084",  # Material Design icon for charging battery
+                    charge_char = "\U000f0084",     # Material Design icon for charging battery
                     discharge_char = "\U000f0083",  # Material Design icon for discharging battery
-                    full_char = "\U000f0079",  # Material Design icon for full battery (same as charging)
-                    unknown_char = "\U000f0091",  # Material Design icon for unknown battery state
+                    full_char = "\U000f0079",       # Material Design icon for full battery (same as charging)
+                    unknown_char = "\U000f0091",    # Material Design icon for unknown battery state
                     low_foreground = "FF0000",  
                     low_percentage = 0.15, 
                     **powerline_forward_slash,
                 ),
 
+                # Current time
                 widget.Clock(
                    background = pywal_theme["base"], 
                    format="\uf43a  %H:%M", 
