@@ -12,5 +12,5 @@ Initially based on <a href="https://github.com/Comfy-Themes/Spicetify"> this the
 
 ## Screenshots
 
-<img src="assets/screenshots/clean.png" />
-<img src="assets/screenshots/rofi.png" />
+<img src="assets/screenshots/fullscreen.png" />
+<img src="assets/screenshots/terminal.png" />
