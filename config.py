@@ -71,7 +71,7 @@ extension_defaults = widget_defaults.copy()
 # Startup/Scripts -----------------------------------------
 @hook.subscribe.startup_once
 def autostart():
-    # subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
+    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
     subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
 
 @hook.subscribe.startup
@@ -140,7 +140,7 @@ keys = [
     Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 5%-"), desc="Decrease brightness using brightnessctl"),
 
     # Key to toggle between Brazilian Portuguese ABNT2 and US English
-    Key(["mod1"], "Tab", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
+    #Key(["mod1"], "shift", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
 
     # Printscreen
     Key([], "Print", lazy.spawn("scrot")),
@@ -197,6 +197,22 @@ powerline_forward_slash = {
     ]
 }
 
+powerline_rounded_left = {
+    "decorations": [
+        PowerLineDecoration(
+            path="rounded_left"
+        )
+    ]
+}
+
+powerline_rounded_right = {
+    "decorations": [
+        PowerLineDecoration(
+            path="rounded_right"
+        )
+    ]
+}
+
 for _ in range(num_screens):
     screen = Screen(
         top=bar.Bar(
@@ -206,7 +222,6 @@ for _ in range(num_screens):
                     filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
                     scale = True, 
                     margin_y = 9,
-                    **powerline_forward_slash,
                 ),
                 
                 widget.GroupBox(
@@ -214,12 +229,12 @@ for _ in range(num_screens):
                     highlight_method = 'block',
                     inactive="#FFFFFF",
                     foreground="#FFFFFF",
-                    **powerline_forward_slash
+                    **powerline_rounded_left,
                 ),
                 
                 widget.Spacer(
                     background = "#00000000", 
-                    **powerline_forward_slash,
+                    **powerline_rounded_right,
                 ),
 
                 # Current brightness
@@ -228,7 +243,7 @@ for _ in range(num_screens):
                     format = '\U000f00e0  {percent:2.0%}',  
                     background = pywal_theme["surface3"],
                     font = font_family_bold,
-                    **powerline_forward_slash,
+                    **powerline_rounded_right,
                 ),
 
                 # Current volume, uses amixer
@@ -236,12 +251,12 @@ for _ in range(num_screens):
                     fmt = '\uf028  {}',
                     background = pywal_theme["surface2"],
                     font = font_family_bold,
-                    **powerline_forward_slash,
+                    **powerline_rounded_right,
                 ),
 
                 # Current battery
                 widget.Battery(
-                    format = '{char}  {percent:2.0%}',  
+                    format = '{char}   {percent:2.0%}',  
                     background = pywal_theme["surface0"],
                     font = font_family_bold,
                     charge_char = "\U000f0084",     # Material Design icon for charging battery
@@ -250,20 +265,26 @@ for _ in range(num_screens):
                     unknown_char = "\U000f0091",    # Material Design icon for unknown battery state
                     low_foreground = "FF0000",  
                     low_percentage = 0.15, 
-                    **powerline_forward_slash,
+                    **powerline_rounded_right,
+                ),
+
+                widget.TextBox(
+                    text="  \uf43a",
+                    background = pywal_theme["base"], 
+                    padding=0,
+                    **powerline_rounded_right,
                 ),
 
                 # Current time
                 widget.Clock(
                    background = pywal_theme["base"], 
-                   format="\uf43a  %H:%M", 
+                   format="%H:%M  ", 
                    font=font_family_bold,
-                   padding=15,
                 ),
             ],
             40,
             background = "#00000000",
-            margin=(5, 10, 15, 10),
+            margin=(5, 10, 15, 5),
         ),
     )
     screens.append(screen)
