@@ -4,8 +4,8 @@ Initially based on <a href="https://github.com/Comfy-Themes/Spicetify"> this the
 
 ## Screenshots
 
-<img src="assets/screenshots/terminal.png" />
-<img src="assets/screenshots/fullscreen.png" />
+<img src="assets/screenshots/everything.png" />
+<img src="assets/screenshots/rofi.png" />
 
 ## Build
 **Distro:** Arch Linux <br/>
