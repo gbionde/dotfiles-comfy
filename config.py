@@ -1,6 +1,6 @@
 # Keys
 from libqtile.lazy import lazy
-from libqtile.config import Key 
+from libqtile.config import Key
 
 # Mouse
 from libqtile.config import Click, Drag
@@ -19,7 +19,7 @@ from libqtile.config import Screen
 from qtile_extras import widget
 from qtile_extras.widget.decorations import PowerLineDecoration
 
-# Startup 
+# Startup
 import os
 import subprocess
 from libqtile import hook
@@ -36,28 +36,47 @@ images_dir = os.path.expanduser("~/images/")
 
 # Font Style
 font_size = 15,
-font_family = "DejaVu Sans"
-font_family_bold = "DejaVu Sans Bold"
+font_family = "Ubuntu Regular"
+font_family_bold = "Ubuntu Mono Regular"
 
 # Pywal dynamic theme
-colors = []
-cache = os.path.join(home_dir, '.cache/wal/colors')
+# colors = []
+# cache = os.path.join(home_dir, '.cache/wal/colors')
 
-def load_colors(cache):
-    with open(cache, 'r') as file:
-        for i in range(8):
-            colors.append(file.readline().strip())
-    colors.append('#ffffff')
-    lazy.reload()
-load_colors(cache)
+# def load_colors(cache):
+#     with open(cache, 'r') as file:
+#         for i in range(8):
+#             colors.append(file.readline().strip())
+#     colors.append('#ffffff')
+#     lazy.reload()
+# load_colors(cache)
 
-pywal_theme = {
-    "base": colors[0],
-    "surface0": colors[1],
-    "surface1": colors[2],
-    "surface2": colors[3],
-    "surface3": colors[4],
-    "surface4": colors[5],
+# pywal_theme = {
+#     "base": colors[0],
+#     "surface0": colors[1],
+#     "surface1": colors[2],
+#     "surface2": colors[3],
+#     "surface3": colors[4],
+#     "surface4": colors[5],
+# }
+
+theme = {
+    "base": "#232634",
+    "surface0": "#414559",
+    "surface1": "#51576d",
+    "surface2": "#626880",
+    "text": "#c6d0f5",
+    "subtext0": "#a5adce",
+    "subtext1": "#b5bfe2",
+    "rosewater": "#f2d5cf",
+    "flamingo": "#eebebe",
+    "pink": "#f4b8e4",
+    "mauve": "#ca9ee6",
+    "green": "#a6d189",
+    "teal":"#81c8be",
+    "sky": "#99d1db",
+    "sapphire": "#85c1dc",
+    "blue": "#8caaee",
 }
 
 widget_defaults = dict(
@@ -73,11 +92,12 @@ extension_defaults = widget_defaults.copy()
 def autostart():
     subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
     subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
+    subprocess.Popen(["wal", "-i", images_dir])
 
 @hook.subscribe.startup
 def restart():
     subprocess.Popen(["wal", "-i", images_dir])
-
+    
 def toggle_keyboard_layout(qtile):
     current_layout = subprocess.run(['setxkbmap', '-query'], capture_output=True, text=True).stdout
     if 'br' in current_layout:
@@ -94,8 +114,9 @@ keys = [
     Key([modifier], "right", lazy.layout.right(), desc="Move focus to right"),
     Key([modifier], "down", lazy.layout.down(), desc="Move focus down"),
     Key([modifier], "up", lazy.layout.up(), desc="Move focus up"),
-    Key([modifier], "space", lazy.layout.next(), desc="Move window focus to other window"),
-   
+    Key(["mod1"], "Tab", lazy.layout.next(), desc="Move window focus to other window"),
+    # Key([modifier], "Tab", lazy.spawn("rofi -show window"), desc="List current opened windows"),
+
     # Move windows between left/right columns or move up/down in current stack.
     Key([modifier, "shift"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
     Key([modifier, "shift"], "right", lazy.layout.shuffle_right(), desc="Move window to the right"),
@@ -108,7 +129,7 @@ keys = [
     Key([modifier, "control"], "down", lazy.layout.grow_down(), desc="Grow window down"),
     Key([modifier, "control"], "up", lazy.layout.grow_up(), desc="Grow window up"),
     Key([modifier], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-    
+
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
@@ -126,7 +147,7 @@ keys = [
     Key([modifier, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([modifier, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([modifier], "r", lazy.spawn(launcher), desc="Spawn launcher"),
-    
+
     # Spawn default file explorer
     Key([modifier], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
 
@@ -140,7 +161,8 @@ keys = [
     Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 5%-"), desc="Decrease brightness using brightnessctl"),
 
     # Key to toggle between Brazilian Portuguese ABNT2 and US English
-    #Key(["mod1"], "shift", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
+    Key(["mod1"], "Shift_L", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
+    # Key(["mod1"], "Tab", lazy.spawn("rofi -show window"), desc="List current opened windows"),
 
     # Printscreen
     Key([], "Print", lazy.spawn("scrot")),
@@ -156,13 +178,16 @@ mouse = [
 
 # Layouts ---------------------------------------------
 layouts = [
+    
     layout.Columns(margin=(0, 5, 5, 5), border_focus='#a1b5ec', border_width=1),
     layout.Max(),
+    # layout.MonadTall(),
+    # layout.Floating(),
 ]
 
 # Groups -----------------------------------------------
-group_icon = "\uf111 "  
-group_hotkeys = "123"  
+group_icon = "\uf111 "
+group_hotkeys = "123"
 
 for hotkey in group_hotkeys:
     keys.extend([
@@ -183,7 +208,7 @@ for hotkey in group_hotkeys:
         )
     ])
 
-groups = [Group(hotkey, label=group_icon) for hotkey in group_hotkeys]
+groups = [Group(hotkey, label=group_icon ) for hotkey in group_hotkeys]
 
 # Screens --------------------------------------------
 screens = []
@@ -218,73 +243,74 @@ for _ in range(num_screens):
         top=bar.Bar(
             [
                 widget.Image(
-                    background = pywal_theme["base"], 
-                    filename = os.path.join(images_dir, "arch-linux-icon.png"),                    
-                    scale = True, 
+                    background = theme["base"],
+                    filename = os.path.join(images_dir, "arch-linux-icon.png"),
+                    scale = True,
                     margin_y = 9,
                 ),
-                
+
                 widget.GroupBox(
-                    background = pywal_theme["base"], 
+                    background = theme["base"],
                     highlight_method = 'block',
                     inactive="#FFFFFF",
                     foreground="#FFFFFF",
                     **powerline_rounded_left,
                 ),
-                
+
                 widget.Spacer(
-                    background = "#00000000", 
+                    background = "#00000000",
+                    **powerline_rounded_right,
+                ),
+
+
+                widget.Spacer(
+                    background = "#00000000",
                     **powerline_rounded_right,
                 ),
 
                 # Current brightness
-                widget.Backlight(
-                    backlight_name="nvidia_0",  
-                    format = '\U000f00e0  {percent:2.0%}',  
-                    background = pywal_theme["surface3"],
-                    font = font_family_bold,
-                    **powerline_rounded_right,
-                ),
+                # widget.Backlight(
+                #     backlight_name="nvidia_0",
+                #     format = '\U000f00e0  {percent:2.0%}',
+                #     background = theme["surface3"],
+                #     font = font_family_bold,
+                #     **powerline_rounded_right,
+                # ),
 
                 # Current volume, uses amixer
                 widget.Volume(
-                    fmt = '\uf028  {}',
-                    background = pywal_theme["surface2"],
+                    fmt = '\uf028   {}',
+                    background = theme["base"],
                     font = font_family_bold,
                     **powerline_rounded_right,
                 ),
 
                 # Current battery
                 widget.Battery(
-                    format = '{char}   {percent:2.0%}',  
-                    background = pywal_theme["surface0"],
+                    format = '{char}   {percent:2.0%}',
+                    background = theme["base"],
                     font = font_family_bold,
-                    charge_char = "\U000f0084",     # Material Design icon for charging battery
-                    discharge_char = "\U000f0083",  # Material Design icon for discharging battery
-                    full_char = "\U000f0079",       # Material Design icon for full battery (same as charging)
-                    unknown_char = "\U000f0091",    # Material Design icon for unknown battery state
-                    low_foreground = "FF0000",  
-                    low_percentage = 0.15, 
-                    **powerline_rounded_right,
-                ),
 
-                widget.TextBox(
-                    text="  \uf43a",
-                    background = pywal_theme["base"], 
-                    padding=0,
+                    unknown_char = "\U000f0091",    # Material Design icon for unknown battery state
+                    discharge_char = "\U000f0083",  # Material Design icon for discharging battery
+                    charge_char = "\U000f0084",     # Material Design icon for charging battery
+                    full_char = "\U000f0079",       # Material Design icon for full battery (same as charging)
+
+                    low_percentage = 0.15,
+                    low_foreground = "FF0000",
                     **powerline_rounded_right,
                 ),
 
                 # Current time
                 widget.Clock(
-                   background = pywal_theme["base"], 
-                   format="%H:%M  ", 
-                   font=font_family_bold,
+                    background = theme["base"],
+                    format="\uf43a   %H:%M  ",
+                    font=font_family_bold,
                 ),
             ],
             40,
             background = "#00000000",
-            margin=(5, 10, 15, 5),
+            margin=(5, 10, 15, 10),
         ),
     )
     screens.append(screen)
@@ -301,11 +327,11 @@ dgroups_app_rules = []  # type: list
 # Controls whether or not focus follows the mouse around as it moves across windows in a layout.
 follow_mouse_focus = True
 
-# When clicked, should the window be brought to the front or not. 
+# When clicked, should the window be brought to the front or not.
 # If this is set to "floating_only", only floating windows will get affected (This sets the X Stack Mode to Above.)
 bring_front_click = False
 
-# If true, the cursor follows the focus as directed by the keyboard, warping to the center of the focused window. 
+# If true, the cursor follows the focus as directed by the keyboard, warping to the center of the focused window.
 # When switching focus between screens, If there are no windows in the screen, the cursor will warp to the center of the screen.
 cursor_warp = False
 
@@ -323,7 +349,7 @@ floating_layout = layout.Floating(
     ]
 )
 
-# If a window requests to be fullscreen, it is automatically fullscreened. 
+# If a window requests to be fullscreen, it is automatically fullscreened.
 # Set this to false if you only want windows to be fullscreen if you ask them to be.
 auto_fullscreen = False
 
