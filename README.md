@@ -13,4 +13,4 @@ Initially based on <a href="https://github.com/Comfy-Themes/Spicetify"> this the
 **Compositor:** jonaburg-picom fork <br/>
 **Terminal:** kitty <br/>
 **Shell:** zsh + oh-my-zsh <br/>
-**Dependencies:** feh, scrot, amixer, brightnessctl, setxkbmap, thunar, ttf-nerd-fonts-symbols. <br/>
+**Dependencies:** feh, scrot, pywal, amixer, brightnessctl, setxkbmap, thunar, ttf-nerd-fonts-symbols. <br/>
