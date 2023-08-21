@@ -5,7 +5,7 @@ Initially based on <a href="https://github.com/Comfy-Themes/Spicetify"> this the
 ## Screenshots
 
 <img src="assets/screenshots/rofi.png" />
-<img src="assets/screenshots/everything.png" />
+<img src="assets/screenshots/scrot.png" />
 
 ## Build
 **Distro:** Arch Linux <br/>
