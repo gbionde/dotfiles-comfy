@@ -1,7 +1,7 @@
 ## Dotfiles
 **Distro:** Arch Linux <br/>
 **WM:** qtile <br/>
-**Compositor:** picom phyOS-fork <br/>
+**Compositor:** picom + picom-animations-git(from aur) <br/>
 **Terminal:** kitty <br/>
 **Shell:** zsh + oh-my-zsh <br/>
 **Dependencies:** feh, scrot, pywal, amixer, brightnessctl, setxkbmap, thunar, ttf-nerd-fonts-symbols. <br/>
