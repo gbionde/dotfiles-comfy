@@ -21,63 +21,8 @@ from qtile_extras.widget.decorations import PowerLineDecoration
 
 # Startup
 import os
-import subprocess
-from libqtile import hook
-
-# Variables ----------------------------------------------
-modifier = "mod4"
-terminal = "kitty"
-explorer = "thunar"
-launcher = "rofi -show drun"
-
-# Directories
-home_dir = os.path.expanduser("~/")
-images_dir = os.path.expanduser("~/images/")
-
-# Font Style
-font_size = 15,
-font_family = "Ubuntu Regular"
-font_family_bold = "Ubuntu Mono Regular"
-
-# Pywal dynamic theme
-# colors = []
-# cache = os.path.join(home_dir, '.cache/wal/colors')
-
-# def load_colors(cache):
-#     with open(cache, 'r') as file:
-#         for i in range(8):
-#             colors.append(file.readline().strip())
-#     colors.append('#ffffff')
-#     lazy.reload()
-# load_colors(cache)
-
-# pywal_theme = {
-#     "base": colors[0],
-#     "surface0": colors[1],
-#     "surface1": colors[2],
-#     "surface2": colors[3],
-#     "surface3": colors[4],
-#     "surface4": colors[5],
-# }
-
-theme = {
-    "base": "#232634",
-    "surface0": "#414559",
-    "surface1": "#51576d",
-    "surface2": "#626880",
-    "text": "#c6d0f5",
-    "subtext0": "#a5adce",
-    "subtext1": "#b5bfe2",
-    "rosewater": "#f2d5cf",
-    "flamingo": "#eebebe",
-    "pink": "#f4b8e4",
-    "mauve": "#ca9ee6",
-    "green": "#a6d189",
-    "teal":"#81c8be",
-    "sky": "#99d1db",
-    "sapphire": "#85c1dc",
-    "blue": "#8caaee",
-}
+from scripts import *
+from themes import current_theme as theme
 
 widget_defaults = dict(
     font = font_family,
@@ -87,26 +32,6 @@ widget_defaults = dict(
 
 extension_defaults = widget_defaults.copy()
 
-# Startup/Scripts -----------------------------------------
-@hook.subscribe.startup_once
-def autostart():
-    subprocess.Popen(["feh", "--bg-fill", os.path.join(images_dir, "catppuccin.png")])
-    subprocess.Popen(["picom", "--config", os.path.join(home_dir, ".config/picom/picom.conf"), "--experimental-backends"])
-    subprocess.Popen(["wal", "-i", images_dir])
-
-@hook.subscribe.startup
-def restart():
-    subprocess.Popen(["wal", "-i", images_dir])
-    
-def toggle_keyboard_layout(qtile):
-    current_layout = subprocess.run(['setxkbmap', '-query'], capture_output=True, text=True).stdout
-    if 'br' in current_layout:
-        # Switch to US English layout
-        subprocess.run(['setxkbmap', 'us'])
-    else:
-        # Switch to Brazilian Portuguese ABNT2 layout
-        subprocess.run(['setxkbmap', 'br', 'abnt2'])
-
 # Key Bindings ------------------------------------------
 keys = [
     # Switch between windows
@@ -115,7 +40,7 @@ keys = [
     Key([modifier], "down", lazy.layout.down(), desc="Move focus down"),
     Key([modifier], "up", lazy.layout.up(), desc="Move focus up"),
     Key(["mod1"], "Tab", lazy.layout.next(), desc="Move window focus to other window"),
-    # Key([modifier], "Tab", lazy.spawn("rofi -show window"), desc="List current opened windows"),
+    # Key(["mod1"], "Tab", lazy.spawn(os.path.join(home_dir, ".config/rofi/launchers/type-3/launcher.sh")), desc="Spawn launcher"),
 
     # Move windows between left/right columns or move up/down in current stack.
     Key([modifier, "shift"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
@@ -133,20 +58,15 @@ keys = [
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
-    Key(
-        [modifier, "shift"],
-        "Return",
-        lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack",
-    ),
     Key([modifier], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([modifier, "shift"], "Return", lazy.layout.toggle_split(), desc="Toggle between split and unsplit sides of stack"),
 
     # Toggle between different layouts
-    Key([modifier], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([modifier], "q", lazy.window.kill(), desc="Kill focused window"),
+    Key([modifier], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([modifier, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([modifier, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([modifier], "r", lazy.spawn(launcher), desc="Spawn launcher"),
+    Key([modifier], "r", lazy.spawn(os.path.join(home_dir, ".config/rofi/launchers/type-7/launcher.sh")), desc="Spawn launcher"),
+    Key([modifier, "shift"], "q", lazy.spawn(os.path.join(home_dir, ".config/rofi/powermenu/type-5/powermenu.sh")), desc="Shutdown Qtile"),
 
     # Spawn default file explorer
     Key([modifier], "e", lazy.spawn(explorer), desc="Spawn file explorer"),
@@ -162,11 +82,12 @@ keys = [
 
     # Key to toggle between Brazilian Portuguese ABNT2 and US English
     Key(["mod1"], "Shift_L", lazy.function(toggle_keyboard_layout), desc="Toggle keyboard layout between BR ABNT2 and US"),
-    # Key(["mod1"], "Tab", lazy.spawn("rofi -show window"), desc="List current opened windows"),
 
     # Printscreen
     Key([], "Print", lazy.spawn("scrot")),
     Key([modifier, "shift"], "s", lazy.spawn("scrot -s")),
+
+    Key([modifier], "f", lazy.window.toggle_floating()),
 ]
 
 # Mouse Bindings --------------------------------------
@@ -178,15 +99,13 @@ mouse = [
 
 # Layouts ---------------------------------------------
 layouts = [
-    
-    layout.Columns(margin=(0, 5, 5, 5), border_focus='#a1b5ec', border_width=1),
+    layout.Columns(margin=(0, 3, 3, 3), border_focus='#a1b5ec', border_width=2),
     layout.Max(),
-    # layout.MonadTall(),
-    # layout.Floating(),
 ]
 
 # Groups -----------------------------------------------
 group_icon = "\uf111 "
+group_icon_selected = "\uebb4 "
 group_hotkeys = "123"
 
 for hotkey in group_hotkeys:
@@ -205,10 +124,11 @@ for hotkey in group_hotkeys:
             hotkey,
             lazy.window.togroup(hotkey, switch_group=False),
             desc=f"Switch to & move focused window to group {hotkey}",
-        )
+        )    
     ])
 
-groups = [Group(hotkey, label=group_icon ) for hotkey in group_hotkeys]
+groups = [Group(hotkey, label=group_icon) for hotkey in group_hotkeys]
+
 
 # Screens --------------------------------------------
 screens = []
@@ -244,7 +164,7 @@ for _ in range(num_screens):
             [
                 widget.Image(
                     background = theme["base"],
-                    filename = os.path.join(images_dir, "arch-linux-icon.png"),
+                    filename = os.path.join(images_dir, "icons/arch-linux-icon.png"),
                     scale = True,
                     margin_y = 9,
                 ),
@@ -261,21 +181,6 @@ for _ in range(num_screens):
                     background = "#00000000",
                     **powerline_rounded_right,
                 ),
-
-
-                widget.Spacer(
-                    background = "#00000000",
-                    **powerline_rounded_right,
-                ),
-
-                # Current brightness
-                # widget.Backlight(
-                #     backlight_name="nvidia_0",
-                #     format = '\U000f00e0  {percent:2.0%}',
-                #     background = theme["surface3"],
-                #     font = font_family_bold,
-                #     **powerline_rounded_right,
-                # ),
 
                 # Current volume, uses amixer
                 widget.Volume(
